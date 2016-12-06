@@ -3,6 +3,7 @@
 #include <string>
 #include <sys/stat.h>
 #include "tlb.h"
+#include <bitset>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
   {
     cout << "Please enter the correct filename as an arg to this program";
     cout << endl << endl;
-    //return 1;
+    return 1;
   }
 
   ifstream inf;
@@ -79,14 +80,26 @@ int main(int argc, char *argv[])
   // Begin parsing input here
 
   TLB tlb;
-  tlb.insert(50, 1);
-  tlb.insert(10, 2);
+  bitset<32> binary;
+  bitset<32> offset;
+  bitset<32> pageNum;
+  bitset<32> offsetGetter(string("00000000000000000000000011111111"));
+  bitset<32> pageNumGetter(string("11111111111111111111111100000000"));
 
-  cout << "Loading 10: " << tlb.isLoaded(10);
-  end();
+  unsigned int logicalAdress;
+  while (!inf.eof())
+  {
+	  inf >> logicalAdress;
+	  binary = logicalAdress;
 
-  cout << "Loading 100: " << tlb.isLoaded(100);
-  end();
+	  offset = binary & offsetGetter;
+	  pageNum = binary & pageNumGetter;
+	  pageNum >>= 8;
+
+	  cout << "logical add: " << logicalAdress << " binary = " << binary.to_string() << " pageNum = " << pageNum.to_ullong() << " offset = " << offset.to_ullong();
+	  end();
+
+  }
   
 
 

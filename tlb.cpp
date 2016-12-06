@@ -16,7 +16,18 @@ bool TLB::insert(const unsigned int pageNum, const unsigned int frameNum)
 	return true;
 }
 
-unsigned int TLB::isLoaded(const unsigned int pageNum)
+bool TLB::isLoaded(const unsigned int pageNum)
+{
+	std::map<unsigned int, unsigned int>::iterator f = table.find(pageNum);
+	if (f != table.end())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+unsigned int TLB::getFrame(const unsigned int pageNum)
 {
 	std::map<unsigned int, unsigned int>::iterator f = table.find(pageNum);
 	if (f != table.end())
