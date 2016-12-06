@@ -7,14 +7,18 @@
 class TLB 
 {
 	public:
-		// Inserts the new entry into the table if the entry is already in table returns false
-		bool insert(const unsigned int pageNum, const unsigned int frameNum);
+		// Inserts the new entry into the table if the entry is already in table returns frame number (max datatype if exists)
+		unsigned long insert(const unsigned long pageNum);
 		// Checks if the page is loaded and returns a bool true = exits
-		bool isLoaded(const unsigned int pageNum);
+		bool isLoaded(const unsigned long pageNum);
 		// Returns the frame number for the given page number if the page number is not found returns the max datatype
-		unsigned int getFrame(const unsigned int pageNum);
+		unsigned long getFrame(const unsigned long pageNum);
+
+		TLB() { numFrames = 0; }
+
 	private:
-		std::map<unsigned int, unsigned int> table;
+		unsigned long numFrames;
+		std::map<unsigned long, unsigned long> table;
 };
 
 #include "tlb.cpp"

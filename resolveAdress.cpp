@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include "tlb.h"
 #include <bitset>
+#include <limits>
 
 using namespace std;
 
@@ -86,7 +87,8 @@ int main(int argc, char *argv[])
   bitset<32> offsetGetter(string("00000000000000000000000011111111"));
   bitset<32> pageNumGetter(string("11111111111111111111111100000000"));
 
-  unsigned int logicalAdress;
+  unsigned long logicalAdress;
+  unsigned long frameNum;
   while (!inf.eof())
   {
 	  inf >> logicalAdress;
@@ -96,7 +98,13 @@ int main(int argc, char *argv[])
 	  pageNum = binary & pageNumGetter;
 	  pageNum >>= 8;
 
-	  cout << "logical add: " << logicalAdress << " binary = " << binary.to_string() << " pageNum = " << pageNum.to_ullong() << " offset = " << offset.to_ullong();
+	  frameNum = tlb.getFrame(pageNum.to_ulong());
+	  if (frameNum == numeric_limits<unsigned long>::max())
+	  {
+		  frameNum = tlb.insert(pageNum.to_ulong());
+	  }
+
+	  cout << "logical add: " << logicalAdress << " binary = " << binary.to_string() << " pageNum = " << pageNum.to_ulong() << " offset = " << offset.to_ulong() << " frameNumber = " << frameNum;
 	  end();
 
   }
