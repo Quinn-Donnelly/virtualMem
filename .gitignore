@@ -30,3 +30,4 @@
 
 # Visual Studios
 *.vcxproj*
+Debug/
