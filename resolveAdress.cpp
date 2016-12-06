@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_DEPRECATE
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -5,6 +6,8 @@
 #include "tlb.h"
 #include <bitset>
 #include <limits>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -24,13 +27,14 @@ int main(int argc, char *argv[])
   {
     cout << "Please enter the correct filename as an arg to this program";
     cout << endl << endl;
-    return 1;
+    //return 1;
   }
 
   ifstream inf;
   ofstream outf;
 
-  inf.open(argv[1]);
+  //inf.open(argv[1]);
+  inf.open("addresses.txt");
 
   string inputIncorrect;
   while(!inf.is_open())
@@ -68,18 +72,14 @@ int main(int argc, char *argv[])
 
   outf.open("results.data");
 
-  // Open the bin file
-  ifstream bin;
-  bin.open("BACKING_STORE.bin");
-
-  if (!bin.is_open())
+  //Open the simulated hard drive file "BACKING_STORE"
+  FILE *disk = fopen("BACKING_STORE.bin", "rb");
+  if (disk == NULL)
   {
-	  cout << "Error BACKING_STORE not found, exiting...";
-	  end();
+	  cout << "Disk file opening failed.\n";
   }
 
-  // Begin parsing input here
-
+  // Adressing variables
   TLB tlb;
   bitset<32> binary;
   bitset<32> offset;
@@ -89,6 +89,9 @@ int main(int argc, char *argv[])
 
   unsigned long logicalAdress;
   unsigned long frameNum;
+
+  char frameBytes[256];
+
   while (!inf.eof())
   {
 	  inf >> logicalAdress;
@@ -101,22 +104,29 @@ int main(int argc, char *argv[])
 	  frameNum = tlb.getFrame(pageNum.to_ulong());
 	  if (frameNum == numeric_limits<unsigned long>::max())
 	  {
-		  frameNum = tlb.insert(pageNum.to_ulong());
+		  //Calculate number of bytes to seek to
+		  int seekNum = pageNum.to_ulong() * 256;
+
+		  //Seek to the frame in the file
+		  fseek(disk, seekNum, SEEK_SET);
+
+		  //Read in the frame
+		  size_t result;
+		  result = fread(frameBytes, 1, 256, disk);
+
+		  frameNum = tlb.insert(pageNum.to_ulong(), frameBytes);
 	  }
 
-	  cout << "logical add: " << logicalAdress << " binary = " << binary.to_string() << " pageNum = " << pageNum.to_ulong() << " offset = " << offset.to_ulong() << " frameNumber = " << frameNum;
+	  cout << "Virtual address: " << logicalAdress << " Physical address: " << frameNum * 256 + offset.to_ulong() << " Value: " << static_cast<int>(tlb.readData(frameNum, offset.to_ulong()));
 	  end();
 
   }
-  
-
-
 
   // End parsing input here
 
   inf.close();
   outf.close();
-  bin.close();
+  fclose(disk);
   cout << "Done!" << endl << endl;
   return 0;
 }
