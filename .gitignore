@@ -31,3 +31,9 @@
 # Visual Studios
 *.vcxproj*
 Debug/
+
+# User Program Generated
+*.data
+
+# VI
+*~
