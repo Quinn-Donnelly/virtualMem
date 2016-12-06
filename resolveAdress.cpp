@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
   inf.close();
   outf.close();
   fclose(disk);
-  cout << "Done!" << endl << endl;
+  cout << "Done! Results are avalible in results.data" << endl << endl;
   return 0;
 }
 
