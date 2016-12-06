@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sys/stat.h>
+#include "tlb.h"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
   {
     cout << "Please enter the correct filename as an arg to this program";
     cout << endl << endl;
-    return 1;
+    //return 1;
   }
 
   ifstream inf;
@@ -65,8 +66,28 @@ int main(int argc, char *argv[])
 
   outf.open("results.data");
 
+  // Open the bin file
+  ifstream bin;
+  bin.open("BACKING_STORE.bin");
+
+  if (!bin.is_open())
+  {
+	  cout << "Error BACKING_STORE not found, exiting...";
+	  end();
+  }
+
   // Begin parsing input here
 
+  TLB tlb;
+  tlb.insert(50, 1);
+  tlb.insert(10, 2);
+
+  cout << "Loading 10: " << tlb.isLoaded(10);
+  end();
+
+  cout << "Loading 100: " << tlb.isLoaded(100);
+  end();
+  
 
 
 
@@ -74,6 +95,7 @@ int main(int argc, char *argv[])
 
   inf.close();
   outf.close();
+  bin.close();
   cout << "Done!" << endl << endl;
   return 0;
 }
