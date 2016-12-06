@@ -24,6 +24,6 @@ class TLB
 		char physicalStore[256][256];
 };
 
-//#include "tlb.cpp"
+#include "tlb.cpp"
 
 #endif // !TLB_H
