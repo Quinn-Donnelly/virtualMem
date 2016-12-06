@@ -13,9 +13,15 @@ using namespace std;
 
 // This will check if the given file name currently exists on disk
 bool doesExist (const string& fileName);
+
 // This function is simply to clean the output to the user where endl() would be used instead use end() on next line
 // at any return point in the main program 2 endl should be added just before exit to keep this style
 void end(){ cout << "\n>> "; }
+
+//Requests permission to overwrite returns answer
+bool askUserPermission();
+
+
 
 int main(int argc, char *argv[])
 {
@@ -48,26 +54,9 @@ int main(int argc, char *argv[])
     inf.open(inputIncorrect.c_str());
   }
 
-  // We check for the file that we will write our data to and prompt the user if it is before overwriting it
-  if(doesExist("results.data"))
+  if (!askUserPermission())
   {
-    cout << "file: \"results.data\"  exits if you continue this file will be overwritten.\nWould you like to continue?";
-    end();
-    cout << "(y,n): ";
-    char ans;
-    cin >> ans;
-    end();
-
-    if(ans == 'n' || ans == 'N')
-    {
-      cout << "Exiting...\n";
-      return 0;
-    }
-    else
-    {
-        cout << "Resuming...\n";
-        end();
-    }
+	  return -1;
   }
 
   outf.open("results.data");
@@ -117,9 +106,7 @@ int main(int argc, char *argv[])
 		  frameNum = tlb.insert(pageNum.to_ulong(), frameBytes);
 	  }
 
-	  cout << "Virtual address: " << logicalAdress << " Physical address: " << frameNum * 256 + offset.to_ulong() << " Value: " << static_cast<int>(tlb.readData(frameNum, offset.to_ulong()));
-	  end();
-
+	  outf << "Virtual address: " << logicalAdress << " Physical address: " << frameNum * 256 + offset.to_ulong() << " Value: " << static_cast<int>(tlb.readData(frameNum, offset.to_ulong())) << "\n";
   }
 
   // End parsing input here
@@ -134,4 +121,31 @@ int main(int argc, char *argv[])
 bool doesExist (const string& fileName) {
   struct stat buffer;
   return (stat (fileName.c_str(), &buffer) == 0);
+}
+
+bool askUserPermission()
+{
+	// We check for the file that we will write our data to and prompt the user if it is before overwriting it
+	if (doesExist("results.data"))
+	{
+		cout << "file: \"results.data\"  exits if you continue this file will be overwritten.\nWould you like to continue?";
+		end();
+		cout << "(y,n): ";
+		char ans;
+		cin >> ans;
+		end();
+
+		if (ans == 'n' || ans == 'N')
+		{
+			cout << "Exiting...\n";
+			return false;
+		}
+		else
+		{
+			cout << "Resuming...\n";
+			end();
+		}
+	}
+
+	return true;
 }
